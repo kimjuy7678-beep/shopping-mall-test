@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 import { create } from "zustand";
 import { auth, db, googleProvider } from "../firebase/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -17,6 +17,10 @@ export const useAuthStore = create((set, get) => ({
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             console.log(userCredential);
             const user = userCredential.user;
+
+            // 이메일 인증보내기
+            sendEmailVerification(user);
+
             // Firestore에 저장하기
             // 1단계 - 저장 위치 지정
             // doc(db, "컬렉션", 문서)
@@ -33,8 +37,8 @@ export const useAuthStore = create((set, get) => ({
             // 3단계 - firestore에 데이터 저장
             await setDoc(userRef, userInfo);
             // 4단계 - zustand에 상태 저장
-            set({ user: userInfo })
-            alert("회원가입성공")
+            // set({ user: userInfo })
+            alert("회원가입성공! 이메일 인증을 완료해주세요")
         }
         catch (err) {
             alert(err.message)
